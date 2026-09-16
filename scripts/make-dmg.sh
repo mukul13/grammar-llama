@@ -15,5 +15,7 @@ cp Resources/AppIcon.icns "$STAGE/.VolumeIcon.icns"
 rm -f "$OUT"
 hdiutil create -quiet -volname "Grammar Llama" -srcfolder "$STAGE" -ov -format UDZO -fs HFS+ "$OUT"
 rm -rf "$STAGE"
-codesign --force --sign "$(security find-identity -v -p codesigning | grep -m1 'Apple Development' | awk '{print $2}')" "$OUT" 2>/dev/null || true
+# Deliberately left unsigned: a DMG signed with a non-Developer-ID certificate is refused outright
+# by Gatekeeper ("Not Opened"), while an unsigned image opens and the app inside is checked on launch.
+# Once you have a Developer ID, sign and notarize here instead.
 echo "DMG written to $OUT ($(du -h "$OUT" | cut -f1))"
