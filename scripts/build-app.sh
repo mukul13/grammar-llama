@@ -23,8 +23,8 @@ echo -n 'APPL????' > "$APP/Contents/PkgInfo"
 #   1. Developer ID Application  -> hardened runtime + timestamp, ready for notarization
 #   2. Apple Development         -> fine locally; downloads still trigger Gatekeeper
 #   3. ad-hoc                    -> last resort
-DEV_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Developer ID Application" | awk '{print $2}')
-DEV_CERT=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Apple Development" | awk '{print $2}')
+DEV_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Developer ID Application" | awk '{print $2}' || true)
+DEV_CERT=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Apple Development" | awk '{print $2}' || true)
 if [[ -n "$DEV_ID" ]]; then
   codesign --force --deep --options runtime --timestamp --sign "$DEV_ID" --identifier com.sidepanda.GrammarLlama "$APP"
   echo "Signed with Developer ID (hardened runtime)"

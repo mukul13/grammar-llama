@@ -18,7 +18,7 @@ rm -f "$ZIP" "$DMG"
 # Notarize when a Developer ID and a stored notarytool profile named "grammar-llama" exist.
 # Set up once with:  xcrun notarytool store-credentials grammar-llama --apple-id <id> --team-id <team> --password <app-specific>
 NOTARIZE=0
-if security find-identity -v -p codesigning | grep -q "Developer ID Application" \
+if (security find-identity -v -p codesigning | grep -q "Developer ID Application") \
    && xcrun notarytool history --keychain-profile grammar-llama >/dev/null 2>&1; then
   NOTARIZE=1
 fi

@@ -17,6 +17,6 @@ hdiutil create -quiet -volname "Grammar Llama" -srcfolder "$STAGE" -ov -format U
 rm -rf "$STAGE"
 # Sign the image only with a Developer ID. A Development-signed DMG is refused outright by
 # Gatekeeper, while an unsigned one opens and the app inside is checked on launch.
-DEV_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Developer ID Application" | awk '{print $2}')
+DEV_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Developer ID Application" | awk '{print $2}' || true)
 [[ -n "$DEV_ID" ]] && codesign --force --timestamp --sign "$DEV_ID" "$OUT"
 echo "DMG written to $OUT ($(du -h "$OUT" | cut -f1))"
