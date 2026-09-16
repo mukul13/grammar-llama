@@ -31,7 +31,7 @@ final class SuggestionPanel: NSPanel {
 
 @MainActor
 final class PanelController: NSObject, NSWindowDelegate {
-    static let width: CGFloat = 480
+    static let width: CGFloat = 520
 
     private var panel: SuggestionPanel?
     private var hosting: NSHostingView<PanelView>?

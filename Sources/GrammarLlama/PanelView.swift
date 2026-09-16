@@ -10,14 +10,17 @@ struct PanelView: View {
     @FocusState private var instructionFocused: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
+        ScrollView(.vertical, showsIndicators: false) {
             content
+                .fixedSize(horizontal: false, vertical: true)   // ideal height, never compressed
                 .background(GeometryReader { g in
                     Color.clear.preference(key: ContentSizeKey.self, value: g.size)
                 })
-            Spacer(minLength: 0)
         }
         .frame(width: PanelController.width, alignment: .top)
+        .background(VisualEffect(material: .popover, blending: .behindWindow))
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(.primary.opacity(0.09)))
         .tint(Theme.accent)
         .onPreferenceChange(ContentSizeKey.self) { size in
             state.panel.contentSizeChanged(size)
@@ -47,9 +50,6 @@ struct PanelView: View {
             }
         }
         .padding(14)
-        .background(VisualEffect(material: .popover, blending: .behindWindow))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(.primary.opacity(0.09)))
     }
 
     private var header: some View {
@@ -116,7 +116,7 @@ struct PanelView: View {
     }
 
     private var bottomBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             if state.isEditing {
                 KeyHint(label: "Replace", keys: "⌘↩")
                 KeyHint(label: "Done", keys: "⎋")
@@ -124,10 +124,9 @@ struct PanelView: View {
                 KeyHint(label: "Replace", keys: "↩")
                 KeyHint(label: "Copy", keys: "C")
                 KeyHint(label: "Edit", keys: "E")
-                KeyHint(label: "Redo", keys: "R")
             }
             KeyHint(label: "Diff", keys: "D", active: state.showDiff)
-            Spacer()
+            Spacer(minLength: 8)
             Button { state.copy() } label: { Text("Copy") }
                 .buttonStyle(GhostStyle())
                 .disabled(state.currentText.isEmpty)
@@ -211,10 +210,12 @@ struct VariantCard: View {
         } else if state.showDiff, !variant.isStreaming {
             Text(WordDiff.attributed(state.original, variant.text))
                 .font(.system(size: 13))
+                .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
         } else {
             Text(variant.text)
                 .font(.system(size: 13))
+                .fixedSize(horizontal: false, vertical: true)
                 .textSelection(.enabled)
         }
     }
@@ -262,8 +263,9 @@ struct KeyHint: View {
     var body: some View {
         HStack(spacing: 4) {
             KeyCap(keys, active: active)
-            Text(label).font(.system(size: 11)).foregroundStyle(.secondary)
+            Text(label).font(.system(size: 11)).foregroundStyle(.secondary).lineLimit(1)
         }
+        .fixedSize()
     }
 }
 
