@@ -8,6 +8,12 @@ This repository holds the Mac app (`Sources/`, Swift + SwiftUI) and the landing 
 
 1. Download the latest `Grammar-Llama-x.y.z.dmg` from [Releases](https://github.com/mukul13/grammar-llama/releases/latest).
 2. Open it and drag **Grammar Llama** onto the Applications folder shown next to it. A `.zip` of the same build is there too if you prefer.
+
+   If macOS says it "could not verify the disk image is free of malware": click **Done**, open **System Settings → Privacy & Security**, scroll to Security and click **Open Anyway** for the disk image. Or clear the quarantine flag in Terminal:
+
+   ```bash
+   xattr -d com.apple.quarantine ~/Downloads/Grammar-Llama-0.1.0.dmg
+   ```
 3. First launch, because the build is not yet notarized: double-click the app once, dismiss the "Not Opened" dialog, then go to **System Settings → Privacy & Security**, scroll to the Security section and click **Open Anyway** next to Grammar Llama. It launches normally after that. Terminal alternative:
 
    ```bash
