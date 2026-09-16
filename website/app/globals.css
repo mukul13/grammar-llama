@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+:root {
+  --cream: #fff6ec;
+  --cream-2: #ffe9d9;
+  --panel: #ffffff;
+  --coral: #f0543f;
+  --coral-deep: #d9432f;
+  --mango: #faa040;
+  --ink: #2b1d16;
+  --ink-2: #7a6257;
+  --ink-3: #b49a8e;
+  --line: rgba(43, 29, 22, 0.1);
+  --good: #1f9d5b;
+  --good-soft: rgba(31, 157, 91, 0.16);
+  --bad-soft: rgba(240, 84, 63, 0.14);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cream: #1b120e;
+    --cream-2: #2a1a13;
+    --panel: #2b1e18;
+    --coral: #ff6a55;
+    --coral-deep: #f0543f;
+    --mango: #ffb25a;
+    --ink: #fff3ea;
+    --ink-2: #cdb7aa;
+    --ink-3: #8c766a;
+    --line: rgba(255, 243, 234, 0.12);
+    --good: #4fc98a;
+    --good-soft: rgba(79, 201, 138, 0.2);
+    --bad-soft: rgba(255, 106, 85, 0.18);
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-cream: var(--cream);
+  --color-cream-2: var(--cream-2);
+  --color-panel: var(--panel);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --color-mango: var(--mango);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-bad-soft: var(--bad-soft);
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --radius-panel: 1rem;
+}
+
+body {
+  background: var(--cream);
+  color: var(--ink);
+}
+
+@utility kbd {
+  @apply inline-flex h-5 min-w-5 items-center justify-center rounded-[5px] bg-ink/8 px-1 font-mono text-[0.6875rem] font-semibold text-ink-2;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .float { animation: float 6s ease-in-out infinite; }
+  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+}
