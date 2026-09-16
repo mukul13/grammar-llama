@@ -37,7 +37,10 @@ final class AppState: ObservableObject {
     func trigger() {
         log.notice("trigger: trusted=\(Permissions.isTrusted) panelVisible=\(self.panel.isVisible)")
         guard Permissions.isTrusted else { Onboarding.show(); return }
-        if panel.isVisible { hide(); return }
+        if panel.isVisible {
+            log.notice("trigger: panel already open, ignoring (press Esc to close)")
+            return
+        }
 
         Task {
             guard let cap = await TextCapture.capture() else {

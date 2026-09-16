@@ -84,8 +84,10 @@ final class HotKeyCenter {
 
         // Always install the monitor too. Carbon fires first when it works; the monitor is a
         // safety net for apps that swallow Carbon hotkeys. Debounced so we never fire twice.
-        monitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
-            guard let self, let hk = self.current, hk.matches(event) else { return }
+        monitor = NSEvent.addGlobalMonitorForEvents(matching: [.keyDown, .keyUp]) { [weak self] event in
+            guard let self, let hk = self.current else { return }
+            if event.type == .keyUp, UInt32(event.keyCode) == hk.keyCode { self.released(); return }
+            guard event.type == .keyDown, !event.isARepeat, hk.matches(event) else { return }
             self.fire()
         }
     }
@@ -96,24 +98,43 @@ final class HotKeyCenter {
     }
 
     private var lastFire = Date.distantPast
+    private var isDown = false
+
+    /// One physical press = one trigger. Key auto-repeat re-sends the press while the keys are
+    /// held; we ignore everything until the combo is released (or 600ms pass as a safety net).
     fileprivate func fire() {
         DispatchQueue.main.async {
-            guard Date().timeIntervalSince(self.lastFire) > 0.25 else { return }
-            self.lastFire = Date()
+            let now = Date()
+            if self.isDown, now.timeIntervalSince(self.lastFire) < 0.6 { return }
+            guard now.timeIntervalSince(self.lastFire) > 0.6 else { return }
+            self.isDown = true
+            self.lastFire = now
             log.notice("Hotkey fired")
             self.onPress?()
         }
     }
 
+    fileprivate func released() {
+        DispatchQueue.main.async { self.isDown = false }
+    }
+
     private func installHandlerIfNeeded() {
         guard handlerRef == nil else { return }
-        var spec = EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed))
+        var specs = [
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyPressed)),
+            EventTypeSpec(eventClass: OSType(kEventClassKeyboard), eventKind: UInt32(kEventHotKeyReleased)),
+        ]
         let selfPtr = Unmanaged.passUnretained(self).toOpaque()
-        let status = InstallEventHandler(GetEventDispatcherTarget(), { _, _, userData in
-            guard let userData else { return noErr }
-            Unmanaged<HotKeyCenter>.fromOpaque(userData).takeUnretainedValue().fire()
+        let status = InstallEventHandler(GetEventDispatcherTarget(), { _, event, userData in
+            guard let userData, let event else { return noErr }
+            let center = Unmanaged<HotKeyCenter>.fromOpaque(userData).takeUnretainedValue()
+            if GetEventKind(event) == UInt32(kEventHotKeyReleased) {
+                center.released()
+            } else {
+                center.fire()
+            }
             return noErr
-        }, 1, &spec, selfPtr, &handlerRef)
+        }, 2, &specs, selfPtr, &handlerRef)
         if status != noErr { log.error("InstallEventHandler failed: \(status)") }
     }
 }
