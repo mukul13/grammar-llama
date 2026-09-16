@@ -19,15 +19,21 @@ cp Resources/Info.plist "$APP/Contents/Info.plist"
 [[ -f Resources/AppIcon.icns ]] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 echo -n 'APPL????' > "$APP/Contents/PkgInfo"
 
-# Sign with an Apple Development identity when one exists so the Accessibility grant
-# survives rebuilds. Falls back to ad-hoc signing (grant may need re-adding after rebuilds).
-SIGN_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Apple Development" | awk '{print $2}')
-if [[ -n "$SIGN_ID" ]]; then
-  codesign --force --deep --sign "$SIGN_ID" --identifier com.sidepanda.GrammarLlama "$APP" >/dev/null 2>&1 \
-    && echo "Signed with Apple Development identity" \
-    || codesign --force --deep --sign - --identifier com.sidepanda.GrammarLlama "$APP" >/dev/null 2>&1
+# Signing, best identity first:
+#   1. Developer ID Application  -> hardened runtime + timestamp, ready for notarization
+#   2. Apple Development         -> fine locally; downloads still trigger Gatekeeper
+#   3. ad-hoc                    -> last resort
+DEV_ID=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Developer ID Application" | awk '{print $2}')
+DEV_CERT=$(security find-identity -v -p codesigning 2>/dev/null | grep -m1 "Apple Development" | awk '{print $2}')
+if [[ -n "$DEV_ID" ]]; then
+  codesign --force --deep --options runtime --timestamp --sign "$DEV_ID" --identifier com.sidepanda.GrammarLlama "$APP"
+  echo "Signed with Developer ID (hardened runtime)"
+elif [[ -n "$DEV_CERT" ]]; then
+  codesign --force --deep --sign "$DEV_CERT" --identifier com.sidepanda.GrammarLlama "$APP" >/dev/null 2>&1
+  echo "Signed with Apple Development identity (not notarizable)"
 else
   codesign --force --deep --sign - --identifier com.sidepanda.GrammarLlama "$APP" >/dev/null 2>&1
+  echo "Ad-hoc signed"
 fi
 echo "Built $APP"
 
