@@ -71,7 +71,7 @@ export default function Home() {
               <div className="mt-28 sm:mt-32">
                 <Demo />
               </div>
-              <p className="mt-3 text-center text-sm text-ink-3">Select, press ⇧⌘E, press Return. That is the whole app.</p>
+              
             </div>
           </div>
         </section>
