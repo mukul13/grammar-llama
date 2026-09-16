@@ -6,8 +6,8 @@ This repository holds the Mac app (`Sources/`, Swift + SwiftUI) and the landing 
 
 ## Install
 
-1. Download the latest `Grammar-Llama-x.y.z.zip` from [Releases](https://github.com/mukul13/grammar-llama/releases/latest).
-2. Unzip and drag **Grammar Llama.app** to Applications.
+1. Download the latest `Grammar-Llama-x.y.z.dmg` from [Releases](https://github.com/mukul13/grammar-llama/releases/latest).
+2. Open it and drag **Grammar Llama** onto the Applications folder shown next to it. A `.zip` of the same build is there too if you prefer.
 3. First launch: right-click the app and choose **Open**. The build is signed but not yet notarized, so macOS asks once. If macOS still refuses, go to System Settings → Privacy & Security and click **Open Anyway**.
 4. Follow the two-step onboarding: allow Accessibility, then paste an API key (Anthropic or OpenAI).
 5. Select text anywhere and press ⇧⌘E. Grammar Llama lives in the menu bar as 🦙.
@@ -64,7 +64,7 @@ Menu bar icon → **Settings…** (or ⌘,):
 ./scripts/release.sh 0.1.0
 ```
 
-Bumps the version, builds, zips the app and publishes a GitHub Release with the `gh` CLI.
+Bumps the version, builds, packs a `.dmg` and a `.zip`, and publishes a GitHub Release with the `gh` CLI.
 
 ## Landing page
 

@@ -11,10 +11,12 @@ BUILD_NUM=$(( $(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" Resources/In
 
 ./scripts/build-app.sh
 ZIP="build/Grammar-Llama-$VERSION.zip"
-rm -f "$ZIP"
+DMG="build/Grammar-Llama-$VERSION.dmg"
+rm -f "$ZIP" "$DMG"
 ditto -c -k --keepParent "build/Grammar Llama.app" "$ZIP"
 echo "Zipped $ZIP"
+./scripts/make-dmg.sh "$DMG"
 
-gh release create "v$VERSION" "$ZIP" \
+gh release create "v$VERSION" "$DMG" "$ZIP" \
   --title "Grammar Llama $VERSION" \
-  --notes "Download, unzip, drag **Grammar Llama.app** to Applications. First launch: right-click the app and choose Open (the build is not yet notarized). Then allow Accessibility and add your Anthropic or OpenAI API key."
+  --notes "Open the **.dmg** and drag **Grammar Llama** onto the Applications folder next to it. First launch: right-click the app and choose Open (the build is not yet notarized). Then allow Accessibility and add your Anthropic or OpenAI API key. The .zip is the same build without the installer window."
