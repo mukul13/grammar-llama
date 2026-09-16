@@ -1,7 +1,7 @@
 #!/bin/zsh
 # Builds "Grammar Llama.app" into ./build and (optionally) launches it.
 #   ./scripts/build-app.sh          # build only
-#   ./scripts/build-app.sh --run    # build and launch
+#   ./scripts/build-app.sh --run    # build, install to /Applications, launch
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -37,8 +37,14 @@ else
 fi
 echo "Built $APP"
 
+# --run installs into /Applications and launches from there, so only one copy of the app is
+# ever registered with Launch Services and the Accessibility grant stays stable.
 if [[ "${1:-}" == "--run" ]]; then
-  pkill -x GrammarLlama 2>/dev/null || true; pkill -x Polish 2>/dev/null || true
+  pkill -x GrammarLlama 2>/dev/null || true
   sleep 0.3
-  open "$APP"
+  rm -rf "/Applications/Grammar Llama.app"
+  cp -R "$APP" /Applications/
+  rm -rf "$APP"
+  open "/Applications/Grammar Llama.app"
+  echo "Installed and launched /Applications/Grammar Llama.app"
 fi
